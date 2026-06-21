@@ -47,3 +47,7 @@ def valumotion_hesapla(zaman_s: float, maddi: float, manevi: float,
             "x_puan": x_puan
         }
     }
+"maddi": maddi,
+"manevi": manevi, 
+"dis_boyut": dis_boyut,
+"x_puan": x_puan,
