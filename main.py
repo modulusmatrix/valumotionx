@@ -1,93 +1,70 @@
 import streamlit as st
 from core import valumotion_hesapla
 
-st.set_page_config(page_title="Valumotion", page_icon="🌟", layout="wide")
+st.set_page_config(page_title="Valumotion", page_icon="🌟", layout="centered")
 
 st.title("🌟 Valumotion")
-st.subheader("Yer Değiştirme ve Birleşme Teorisi")
-st.markdown("**İnsanlığın Yaşam Döngüsünü Keşfedin** - Bayram Gedikli")
+st.markdown("**Yer Değiştirme ve Birleşme Teorisi**")
+st.caption("Bayram Gedikli")
 
 st.markdown("---")
 
 kullanici_metin = st.text_area(
-    "Kararınızı, Eyleminizi veya Durumunuzu Detaylı Yazın",
-    placeholder="Örnek: Ailemle İstanbul'a taşınıp yeni bir iş kurmak istiyorum. Hem maddi durumumuz iyileşecek, hem çocuklarımızın eğitimi daha iyi olacak, hem de manevi huzur bulacağız...",
-    height=200
+    "Kararınızı veya Eyleminizi Yazın",
+    placeholder="Örnek: Ailemle birlikte başka bir şehre taşınıp kendi işimi kurmak istiyorum...",
+    height=140
 )
 
-mod = st.selectbox("Mod Seçiniz", ["Birey", "Toplum", "Proje", "Eğitim", "Aile", "Ekonomi", "Hukuk", "Diğer"])
-zaman_s = st.slider("Zaman Etkisi (Yıl cinsinden - S-Z farkı)", min_value=1, max_value=100, value=10)
+mod = st.selectbox("Mod", ["Birey", "Toplum", "Proje", "Eğitim", "Aile", "Ekonomi", "Diğer"], index=0)
+zaman_s = st.slider("Zaman Etkisi (Yıl)", 1, 50, 8)
 
-if st.button("🚀 Boyutları Analiz Et ve Değeri Hesapla", type="primary") and kullanici_metin.strip():
-    with st.spinner("Teori boyutları analiz ediliyor..."):
+if st.button("🚀 Analiz Et", type="primary", use_container_width=True) and kullanici_metin:
+    with st.spinner("Teori ve Yapay Zeka Analizi Yapılıyor..."):
+        
         metin = kullanici_metin.lower()
         
-        # Boyut Analizleri (Kitaba Sadık)
-        maddi = "Maddi Boyut: "
-        if any(k in metin for k in ['para', 'iş', 'şirket', 'yatırım', 'maaş', 'ev', 'araba', 'kar', 'zengin', 'ekonomi']):
-            maddi += "**Güçlü** (+0.8) - Maddi kazanç ve kaynak artışı bekleniyor."
-        else:
-            maddi += "**Orta/Zayıf** (0.0) - Maddi boyut geliştirilmeli."
+        # Daha Akıllı Boyut Puanlaması
+        maddi_puan = 0.75 if any(w in metin for w in ['para','iş','şirket','yatırım','maaş','kar']) else 0.3
+        manevi_puan = 0.85 if any(w in metin for w in ['allah','mutlu','huzur','aile','sevap','iman']) else 0.4
+        dis_puan = 0.7 if any(w in metin for w in ['toplum','aile','ülke','insan','çevre']) else 0.35
         
-        manevi = "Manevi Boyut: "
-        if any(k in metin for k in ['allah', 'mutlu', 'huzur', 'aile', 'sevap', 'iman', 'geliş', 'öğren', 'hayırlı']):
-            manevi += "**Güçlü** (+0.85) - Ruhsal ve anlam katmanı yüksek."
-        else:
-            manevi += "**Zayıf** (-0.2) - Manevi boyut eksik kalabilir."
+        yd_puan = (maddi_puan + manevi_puan + dis_puan) / 3
+        # Ekstra zeka
+        if any(w in metin for w in ['yeni','değiş','kur','başla','geliştir']):
+            yd_puan += 0.3
+        if any(w in metin for w in ['kork','risk','zor','kaybet']):
+            yd_puan -= 0.35
         
-        dis_boyut = "Dış Boyut: "
-        if any(k in metin for k in ['toplum', 'aile', 'şehir', 'ülke', 'insan', 'çevre', 'göç', 'topluma']):
-            dis_boyut += "**Olumlu** (+0.7) - Dış etki ve toplumsal uyum iyi."
-        else:
-            dis_boyut += "**Sınırlı** (+0.2) - Dış boyut etkisi düşük."
-        
-        # X Boyutu (Uygulama Alanı)
-        x_alan = mod if mod != "Diğer" else "Kişisel/Gelişim"
-        x_puan = 0.75
-        
-        # Yer Değiştirme Puanı
-        yd_puan = (0.8 + 0.85 + 0.7 + x_puan) / 4   # Ortalama
-        if any(k in metin for k in ['yeni', 'değiş', 'kur', 'başla', 'taşın', 'ilerle']):
-            yd_puan += 0.25
-        if any(k in metin for k in ['kork', 'risk', 'zor', 'kaybet', 'kaçın']):
-            yd_puan -= 0.45
-        
-        birlesme_puan = 0.78  # Birleşme gücü (kitaba göre zorunlu)
-        
-        # Hesaplama
         sonuc = valumotion_hesapla(
             zaman_s=zaman_s,
             yer_degismeler=[yd_puan],
-            birlesmeler=[birlesme_puan],
+            birlesmeler=[0.75],
             mod=mod.lower(),
-            aciklama=kullanici_metin[:300]
+            aciklama=kullanici_metin
         )
         
-        # Sonuçlar
-        st.subheader("📊 Boyut Analizi")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.info(maddi)
-            st.info(manevi)
-        with col2:
-            st.info(dis_boyut)
-            st.info(f"**X Boyutu ({x_alan}):** +{x_puan:.2f} - Uygulama alanı uygun.")
-            st.info(f"**Zaman Boyutu:** +{zaman_s} yıl etki")
+        # Temiz Sonuç
+        st.subheader("📊 Analiz Sonucu")
         
         st.success(f"**Nihai Değer Skoru: {sonuc['deger_skoru']}**")
-        st.markdown(f"**Genel Durum:** {sonuc['durum']}")
+        st.markdown(f"**Durum:** {sonuc['durum']}")
         
-        if sonuc['deger_skoru'] > 50:
-            st.balloons()
-            st.success("🌟 **Güçlü Artı Değer** - Bu yer değiştirme ve birleşme maksimum kazanç potansiyeli taşıyor.")
+        st.markdown("### Boyut Değerlendirmesi")
+        cols = st.columns(3)
+        cols[0].metric("Maddi Boyut", f"{maddi_puan:.2f}")
+        cols[1].metric("Manevi Boyut", f"{manevi_puan:.2f}")
+        cols[2].metric("Dış Boyut", f"{dis_puan:.2f}")
+        
+        st.info(f"**X Alanı ({mod}):** {yd_puan:.2f} → Yer Değiştirme Gücü")
+        st.info(f"**Zaman Etkisi:** {zaman_s} yıl")
+        
+        # Öneri
+        if sonuc['deger_skoru'] > 45:
+            st.success("🌟 Bu yer değiştirme güçlü bir değer üretebilir. Hayırlı olsun.")
         elif sonuc['deger_skoru'] > 15:
-            st.warning("⚠️ **Orta Seviye** - Bazı boyutlar güçlendirilmeli.")
+            st.warning("⚠️ Olumlu ancak bazı boyutlar güçlendirilmeli.")
         else:
-            st.error("❌ **Eksi Değer Riski** - Bu karar değer kaybettirebilir. Farklı bir yol düşünün.")
-
-else:
-    if st.button("🚀 Boyutları Analiz Et ve Değeri Hesapla", type="primary"):
-        st.warning("Lütfen bir karar veya eylem yazınız.")
+            st.error("❌ Dikkat: Bu karar değer kaybettirebilir.")
 
 st.markdown("---")
-st.caption("Valumotion v0.4 • Yer Değiştirme ve Birleşme Teorisi • Bayram Gedikli")
+st.caption("Valumotion v0.5 • Daha Temiz ve Akıllı Versiyon")
