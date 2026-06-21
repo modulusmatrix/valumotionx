@@ -22,6 +22,51 @@ def valumotion_hesapla(zaman_s: float, maddi: float, manevi: float,
     
     esik = 10 * mod_katsayi.get(mod.lower(), 1.0)
     durum = "Maksimum Deger Kazanci" if deger > esik else "Deger Kaybi Riski"
+    def valumotion_hesapla(zaman_s: float, maddi: float, manevi: float, 
+                      dis_boyut: float, x_puan: float, mod: str = "birey"):
+    
+    if zaman_s <= 0:
+        raise ValueError("Zaman pozitif olmali")
+    for val, name in [(maddi,"maddi"), (manevi,"manevi"), (dis_boyut,"dis_boyut"), (x_puan,"x_puan")]:
+        if not 0 <= val <= 1:
+            raise ValueError(f"{name} 0-1 arasinda olmali")
+    
+    yd = (maddi + manevi + dis_boyut + x_puan) / 4
+    birlesme = (maddi * manevi * dis_boyut * x_puan) ** 0.25
+    deger = zaman_s * (yd * birlesme)
+    
+    mod_katsayi = {
+        "birey": 1.0, "aile": 1.2, "ekonomi": 1.15,
+        "egitim": 1.25, "toplum": 1.4, "proje": 1.1
+    }
+    katsayi = mod_katsayi.get(mod.lower(), 1.0)  # ← Değişken yaptık
+    deger = deger * katsayi
+    
+    esik = 10 * katsayi
+    durum = "Maksimum Deger Kazanci" if deger > esik else "Deger Kaybi Riski"
+    
+   def valumotion_hesapla(zaman_s: float, maddi: float, manevi: float, 
+                      dis_boyut: float, x_puan: float, mod: str = "birey"):
+    
+    if zaman_s <= 0:
+        raise ValueError("Zaman pozitif olmali")
+    for val, name in [(maddi,"maddi"), (manevi,"manevi"), (dis_boyut,"dis_boyut"), (x_puan,"x_puan")]:
+        if not 0 <= val <= 1:
+            raise ValueError(f"{name} 0-1 arasinda olmali")
+    
+    yd = (maddi + manevi + dis_boyut + x_puan) / 4
+    birlesme = (maddi * manevi * dis_boyut * x_puan) ** 0.25
+    deger = zaman_s * (yd * birlesme)
+    
+    mod_katsayi = {
+        "birey": 1.0, "aile": 1.2, "ekonomi": 1.15,
+        "egitim": 1.25, "toplum": 1.4, "proje": 1.1
+    }
+    katsayi = mod_katsayi.get(mod.lower(), 1.0)  # ← Değişken yaptık
+    deger = deger * katsayi
+    
+    esik = 10 * katsayi
+    durum = "Maksimum Deger Kazanci" if deger > esik else "Deger Kaybi Riski"
     
     return {
         "deger_skoru": round(deger, 2),
@@ -29,9 +74,11 @@ def valumotion_hesapla(zaman_s: float, maddi: float, manevi: float,
         "aciklama": f"{mod.capitalize()} modunda {zaman_s}s icin hesaplandi",
         "yer_degistirme": round(yd, 3),
         "birlesme": round(birlesme, 3),
+        "mod_katsayisi": katsayi,  # ← BUNU EKLEDİK
         "maddi": maddi,
         "manevi": manevi,
         "dis_boyut": dis_boyut,
         "x_puan": x_puan,
         "mod": mod.capitalize()
     }
+    
